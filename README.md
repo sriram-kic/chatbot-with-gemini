@@ -25,3 +25,37 @@ A simple web-based chatbot using Google's Gemini AI model, built with Flask for 
 ```bash
 git clone https://github.com/yourusername/gemini-flask-chatbot.git
 cd gemini-flask-chatbot
+
+
+### 2. Install Dependency
+
+pip install flask requests
+
+### 3. Set your GEMNINI API Key
+
+GEMINI_API_KEY = "YOUR_GEMINI_API_KEY"
+
+### 4. Run the App Locally
+
+python app.py
+
+### 5. Folder Strucutre
+
+gemini-flask-chatbot/
+│
+├── static/
+│   └── style.css
+│
+├── templates/
+│   └── index.html
+│
+├── app.py
+└── README.md
+
+
+
+
+
+
+
+
