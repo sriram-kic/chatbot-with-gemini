@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Chat Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div class="avatar">
+                    <i class="fas fa-robot" style="color: white; font-size: 1rem;"></i>
+                </div>
+                <div class="header-text">
+                    <h1>Chat Assistant</h1>
+                    <p>AI-powered support</p>
+                </div>
+            </div>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span>Online</span>
+            </div>
+        </div>
+        
+        <div class="chat-container">
+            <div id="chatlog" class="chatlog">
+                <!-- Messages will appear here -->
+            </div>
+            
+            <div class="input-area">
+                <div class="input-container">
+                    <input type="text" id="userInput" placeholder="Type your message..." autofocus>
+                    <button id="sendBtn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function sendMessage() {
+            const userInput = document.getElementById("userInput");
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            const chatlog = document.getElementById("chatlog");
+            
+            // Add user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message message-user user-message';
+            userMessage.innerHTML = `
+                <div class="message-content">${message}</div>
+                <div class="message-time">${getCurrentTime()}</div>
+            `;
+            chatlog.appendChild(userMessage);
+            
+            userInput.value = "";
+            chatlog.scrollTop = chatlog.scrollHeight;
+
+            // Show typing indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'message message-bot';
+            typingIndicator.innerHTML = `
+                <div class="typing-indicator">
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `;
+            chatlog.appendChild(typingIndicator);
+            chatlog.scrollTop = chatlog.scrollHeight;
+
+            // Send message to server
+            fetch("/get", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `msg=${encodeURIComponent(message)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Remove typing indicator
+                typingIndicator.remove();
+                
+                // Add bot response
+                const botMessage = document.createElement('div');
+                botMessage.className = 'message message-bot bot-message';
+                botMessage.innerHTML = `
+                    <div class="message-content">${data.response}</div>
+                    <div class="message-time">${getCurrentTime()}</div>
+                `;
+                chatlog.appendChild(botMessage);
+                chatlog.scrollTop = chatlog.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                typingIndicator.remove();
+                
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'message message-bot bot-message';
+                errorMessage.innerHTML = `
+                    <div class="message-content">Sorry, I'm having trouble connecting. Please try again later.</div>
+                    <div class="message-time">${getCurrentTime()}</div>
+                `;
+                chatlog.appendChild(errorMessage);
+                chatlog.scrollTop = chatlog.scrollHeight;
+            });
+        }
+
+        // Handle Enter key press
+        document.getElementById("userInput").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") sendMessage();
+        });
+
+        // Initial greeting
+        window.onload = function() {
+            setTimeout(() => {
+                const chatlog = document.getElementById("chatlog");
+                const greeting = document.createElement('div');
+                greeting.className = 'message message-bot bot-message';
+                greeting.innerHTML = `
+                    <div class="message-content">Hello! I'm your Enterprise Assistant. How can I help you today?</div>
+                    <div class="message-time">${getCurrentTime()}</div>
+                `;
+                chatlog.appendChild(greeting);
+                chatlog.scrollTop = chatlog.scrollHeight;
+            }, 500);
+        };
+    </script>
+</body>
+</html>
