@@ -4,8 +4,8 @@ import os
 
 app = Flask(__name__)
 
-GEMINI_API_KEY = "AIzaSyBUVHCxfydITRET5GcFzY71H0AJYMnBk4U"
-GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={AIzaSyBUVHCxfydITRET5GcFzY71H0AJYMnBk4U}"
+GEMINI_API_KEY = "API_Key"
+GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_Key}"
 
 @app.route("/")
 def home():
